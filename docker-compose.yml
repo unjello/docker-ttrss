@@ -1,0 +1,27 @@
+version: "2"
+services:
+    db:
+        image: "postgres"
+        environment: 
+            POSTGRES_PASSWORD: ${TTRSS_DB_PASS}
+            POSTGRES_USER: ${TTRSS_DB_USER}
+        volumes: 
+            - ${TTRSS_DB_PATH}:/var/lib/postgresql/data
+            - ${TTRSS_LOG_PATH}:/tmp/
+        networks:
+            - ttrss
+    web:
+        build: .
+        environment:
+            DB_PASS: ${TTRSS_DB_PASS}
+            DB_NAME: ${TTRSS_DB_NAME}
+            DB_USER: ${TTRSS_DB_USER}
+            HOSTING_URL: ${TTRSS_URL}
+        ports:
+            - 80:80
+        depends_on:
+            - db
+        networks:
+            - ttrss
+networks:
+    ttrss:

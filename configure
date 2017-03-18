@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+sed -i "s/DB_USER', \".*\"/DB_USER', \"$DB_USER\"/" /var/www/config.php
+sed -i "s/DB_NAME', \".*\"/DB_NAME', \"$DB_NAME\"/" /var/www/config.php
+sed -i "s/DB_PASS', \".*\"/DB_PASS', \"$DB_PASS\"/" /var/www/config.php
+sed -i "s/DB_HOST', \".*\"/DB_HOST', \"db\"/" /var/www/config.php
+sed -i "s#SELF_URL_PATH', '.*'#SELF_URL_PATH', \"$HOSTING_URL\"#" /var/www/config.php
+
+chmod -R 777 /var/www/cache/images/
+chmod -R 777 /var/www/cache/upload/
+chmod -R 777 /var/www/cache/export/
+chmod -R 777 /var/www/cache/js/
+chmod -R 777 /var/www/feed-icons/
+chmod -R 777 /var/www/lock/
+
+while ! PGPASSWORD=$DB_PASS psql -q -h db -U $DB_USER -c "\q"; do echo "Waiting for database to come up..." 2>1 1>/dev/null && sleep 5; done
+if ! PGPASSWORD=$DB_PASS psql -h db -U $DB_USER $DB_NAME -c "\q"
+then 
+    PGPASSWORD=$DB_PASS psql -h db -U $DB_USER -c "CREATE DATABASE ttrss;"
+    PGPASSWORD=$DB_PASS psql -h db -U $DB_USER $DB_NAME < /var/www/schema/ttrss_schema_pgsql.sql
+fi

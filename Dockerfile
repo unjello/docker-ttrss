@@ -1,38 +1,36 @@
 FROM ubuntu
-MAINTAINER Christian Lück <christian@lueck.tv>
+MAINTAINER Andrzej Lichnerowicz <andrzej@lichnerowicz.pl>
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
-  nginx supervisor php5-fpm php5-cli php5-curl php5-gd php5-json \
-  php5-pgsql php5-mysql php5-mcrypt && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yq \
+        nginx \
+        supervisor \
+        php7.0-fpm php7.0-cli php7.0-curl php7.0-gd php7.0-json php7.0-pgsql php7.0-mcrypt php7.0-mbstring php-fdomdocument
+        
 
-# enable the mcrypt module
-RUN php5enmod mcrypt
-
-# add ttrss as the only nginx site
 ADD ttrss.nginx.conf /etc/nginx/sites-available/ttrss
 RUN ln -s /etc/nginx/sites-available/ttrss /etc/nginx/sites-enabled/ttrss
 RUN rm /etc/nginx/sites-enabled/default
 
-# install ttrss and patch configuration
 WORKDIR /var/www
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y curl --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+RUN rm -rf /var/www/html
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y curl --no-install-recommends \
     && curl -SL https://tt-rss.org/gitlab/fox/tt-rss/repository/archive.tar.gz?ref=master | tar xzC /var/www --strip-components 1 \
     && apt-get purge -y --auto-remove curl \
     && chown www-data:www-data -R /var/www
 RUN cp config.php-dist config.php
 
-# expose only nginx HTTP port
-EXPOSE 80
+EXPOSE 80        
 
-# complete path to ttrss
 ENV SELF_URL_PATH http://localhost
-
-# expose default database credentials via ENV in order to ease overwriting
 ENV DB_NAME ttrss
-ENV DB_USER ttrss
+ENV DB_USER postgres
 ENV DB_PASS ttrss
 
-# always re-configure database with current ENV when RUNning container, then monitor all services
-ADD configure-db.php /configure-db.php
+ADD configure /configure
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-CMD php /configure-db.php && supervisord -c /etc/supervisor/conf.d/supervisord.conf
+RUN mkdir -p /run/php
+RUN chmod a+x /configure
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-client --no-install-recommends && rm -rf /var/lib/apt/lists/*
+
+CMD /configure && supervisord -c /etc/supervisor/conf.d/supervisord.conf
