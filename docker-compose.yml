@@ -18,7 +18,7 @@ services:
             DB_USER: ${TTRSS_DB_USER}
             HOSTING_URL: ${TTRSS_URL}
         ports:
-            - 80:80
+            - ${TTRSS_LOCAL_PORT}:80
         depends_on:
             - db
         networks:
