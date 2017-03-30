@@ -11,7 +11,7 @@ services:
         networks:
             - ttrss
     web:
-        build: .
+        image: "unjello/ttrss"
         environment:
             DB_PASS: ${TTRSS_DB_PASS}
             DB_NAME: ${TTRSS_DB_NAME}
