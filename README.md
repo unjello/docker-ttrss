@@ -1,6 +1,13 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/unjello/ttrss.svg)](https://hub.docker.com/r/unjello/ttrss/)
+[![Docker Stars](https://img.shields.io/docker/stars/unjello/ttrss.svg)](https://hub.docker.com/r/unjello/ttrss/)
+[![](https://images.microbadger.com/badges/image/unjello/ttrss.svg)](https://microbadger.com/images/unjello/ttrss)
+[![](https://images.microbadger.com/badges/version/unjello/ttrss.svg)](https://microbadger.com/images/unjello/ttrss)
+
 # docker-ttrss
 
-This [Docker](https://www.docker.com) image allows you to run the [Tiny Tiny RSS](http://tt-rss.org) feed reader.
+Dockerfile for [Tiny Tiny RSS](http://tt-rss.org) feed reader.
+
+The image is available directly from [Docker Hub](https://hub.docker.com/r/unjello/ttrss/)
 
 Repo was hugely inspired by [Christian Lück's](https://github.com/clue) [docker-ttrss](https://github.com/clue/docker-ttrss) container which unfortunately haven't been updated for a while (ie. used php5 which is no longer available in ubuntu 16.04).
 
